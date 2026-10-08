@@ -1,0 +1,234 @@
+* { box-sizing: border-box; }
+/* Never a scrollbar, ever — a scrollbar appearing/disappearing (or the
+   page's scroll position shifting) as content changes height is exactly
+   what made the whole browser view creep up/down while just walking the
+   player up/down. Content that doesn't fit the viewport gets clipped
+   instead of growing a scrollbar. */
+html, body { overflow: hidden; }
+body {
+  margin: 0;
+  background: #0b0f1a;
+  color: #eef;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+#charSelectOverlay {
+  text-align: center;
+  padding: 24px;
+  max-width: 640px;
+}
+#charSelectOverlay h1 { margin-bottom: 4px; }
+#charSelectOverlay p { color: #9ab; }
+#starterGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.starterBtn {
+  background: #182238;
+  border: 2px solid #2c3e5c;
+  border-radius: 10px;
+  color: #eef;
+  padding: 10px;
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.1s;
+}
+.starterBtn:hover { border-color: #4aa8ff; transform: scale(1.05); }
+.starterBtn img { width: 64px; height: 64px; object-fit: contain; border-radius: 50%; background: #fff; }
+.starterBtn div { margin-top: 6px; font-size: 13px; }
+
+#megaPickerOverlay {
+  display: none;
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 60;
+  width: min(680px, 90vw);
+  max-height: 80vh;
+  background: #131a2b;
+  border: 2px solid #ff5f9e;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  overflow-y: auto;
+}
+#megaPickerOverlay.open { display: block; }
+#megaPickerOverlay h2 { margin: 0 0 4px; color: #ff9d3c; }
+#megaPickerOverlay p { color: #9ab; margin: 0 0 12px; font-size: 13px; }
+#megaPickerSearch {
+  width: 100%; padding: 8px 10px; margin-bottom: 12px;
+  border-radius: 6px; border: 1px solid #3a4a68; background: #0e1524; color: #eef; font-size: 13px;
+}
+#megaPickerGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  max-height: 55vh;
+  overflow-y: auto;
+}
+
+/* The canvas resizes dynamically (7x7 up to 13x13 tiles) as the player
+   evolves. Status (name/HP/Digicharge/Score) lives permanently in the right
+   sidebar — never above the canvas — so it's never squeezed off-screen no
+   matter how big the board gets. */
+#playArea { display: none; align-items: flex-start; gap: 16px; }
+#gameUI { display: flex; flex-direction: column; align-items: center; gap: 8px; width: max-content; }
+
+#rightSidebar { display: flex; flex-direction: column; gap: 12px; width: 220px; flex-shrink: 0; }
+
+#placeBox {
+  background: linear-gradient(#1c2740, #131a2b);
+  border: 1px solid #4a68a0;
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.placeBoxTitle { font-size: 16px; font-weight: 700; color: #eaf2ff; line-height: 1.3; }
+.placeBoxSub { font-size: 11px; font-weight: normal; color: #9ab; }
+
+#statusPanel {
+  background: #131a2b;
+  border: 1px solid #3a4a68;
+  border-radius: 8px;
+  padding: 12px;
+}
+.statusName { font-size: 15px; font-weight: 600; }
+.statusScore { font-size: 13px; margin-top: 8px; color: #ffd166; }
+.statusTimer { font-size: 12px; margin-top: 2px; color: #9ab; font-variant-numeric: tabular-nums; }
+.statusPacific { font-size: 11px; margin-top: 4px; color: #8ecb8e; }
+.statusPacific.warn { color: #ff9d6a; }
+.statRow { margin: 8px 0; }
+.statHeader { display: flex; justify-content: space-between; font-size: 11px; color: #cde; margin-bottom: 2px; }
+.statValue { color: #fff; font-variant-numeric: tabular-nums; }
+
+.barTrack { background: #1a2130; border: 1px solid #333; border-radius: 4px; height: 12px; position: relative; overflow: hidden; }
+.barFill { height: 100%; transition: width 0.15s; }
+#hpBar { background: linear-gradient(#ff6363, #c62828); }
+#energyBar { background: linear-gradient(#ffe066, #ff9d3c); }
+.megaBar { background: linear-gradient(#ffb347, #ff5f9e); }
+
+canvas { border: 3px solid #2c3e5c; border-radius: 6px; background: #123a63; image-rendering: pixelated; }
+
+/* min-height + a hard cap with overflow:hidden — several toasts stacking
+   up must never grow this box past a fixed footprint, or everything below
+   it (and the canvas above it is already fixed, see #gateInfo) creeps. */
+#toasts { width: 100%; min-height: 30px; max-height: 90px; overflow: hidden; display: flex; flex-direction: column; gap: 4px; }
+.toast {
+  background: rgba(20, 28, 45, 0.92);
+  border: 1px solid #3a4a68;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  transition: opacity 0.5s;
+}
+.toast.fade { opacity: 0; }
+
+#instructions { font-size: 11px; color: #8ba; width: 100%; text-align: center; }
+#affinityLabel { font-size: 11px; color: #ffd166; width: 100%; text-align: center; min-height: 14px; }
+/* Always occupies the same footprint (empty-but-present when there's no
+   nearby Gate to describe) — using visibility instead of display so the
+   canvas above it never shifts up/down as this shows and hides while
+   walking around the Village. min-height covers name + typicality on two
+   lines; overflow:hidden clips anything longer instead of growing. */
+#gateInfo {
+  visibility: hidden;
+  width: 100%;
+  min-height: 48px;
+  max-height: 48px;
+  overflow: hidden;
+  text-align: center;
+  font-size: 12px;
+  color: #f0e6ff;
+  background: rgba(122, 63, 242, 0.18);
+  border: 1px solid #7a3ff2;
+  border-radius: 6px;
+  padding: 4px 8px;
+  line-height: 1.4;
+}
+#gateInfo.visible { visibility: visible; }
+#foodLegend { font-size: 11px; color: #cde; width: 100%; text-align: center; line-height: 1.6; }
+.foodChip {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; border-radius: 50%; color: #111;
+  font-size: 9px; font-weight: bold; margin-right: 2px;
+}
+
+#evoPanel {
+  width: 100%;
+  background: #131a2b;
+  border: 1px solid #3a4a68;
+  border-radius: 8px;
+  padding: 12px;
+  max-height: 560px;
+  overflow-y: auto;
+}
+#evoPanel h3 { margin: 0 0 8px; font-size: 14px; }
+.evoNote { font-size: 12px; color: #9ab; line-height: 1.4; }
+.evoRow {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 4px; border-radius: 6px; font-size: 12px;
+}
+.evoRow img { width: 32px; height: 32px; object-fit: contain; border-radius: 50%; background: #fff; flex-shrink: 0; }
+.evoRow .evoInfo { display: flex; flex-direction: column; }
+.evoRow .evoType { font-size: 10px; color: #9ab; }
+.evoRow.favored { background: rgba(255, 209, 102, 0.15); }
+
+/* left/top are set from JS each time a cutscene starts, positioned against
+   the canvas's own bounding box (not the window) so it stays put no matter
+   where the page happens to center it. */
+#cutsceneOverlay {
+  display: none;
+  position: fixed;
+  transform: translate(-50%, -50%);
+  z-index: 50;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 0 12px #000, 0 0 4px #000;
+  font-size: 22px;
+  font-weight: 600;
+  pointer-events: none;
+}
+#cutsceneOverlay .sub { font-size: 13px; font-weight: normal; color: #dde; margin-top: 6px; }
+
+#settings {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: 280px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  background: #131a2b;
+  border: 1px solid #3a4a68;
+  border-radius: 8px;
+  padding: 14px;
+  display: none;
+  font-size: 13px;
+}
+#settings.open { display: block; }
+#settings h3 { margin: 0 0 8px; font-size: 14px; }
+#settings h4 { margin: 14px 0 6px; font-size: 12px; color: #9ab; border-top: 1px solid #2a3550; padding-top: 10px; }
+#settings label { display: block; margin: 8px 0; }
+#settings input[type=range] { width: 100%; }
+#settings button { margin-top: 10px; width: 100%; padding: 6px; cursor: pointer; }
+#settings .hint { color: #789; font-size: 11px; margin-top: 8px; }
+
+#evoSearchInput {
+  width: 100%; padding: 6px 8px; border-radius: 6px;
+  border: 1px solid #3a4a68; background: #0e1524; color: #eef; font-size: 12px;
+}
+#evoSearchSuggestions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.evoSuggestBtn {
+  background: #1c2740; border: 1px solid #3a4a68; color: #eef;
+  border-radius: 6px; padding: 3px 7px; font-size: 11px; cursor: pointer;
+}
+.evoSuggestBtn:hover { border-color: #4aa8ff; }
+.evoSearchGroup h5, .evoSearchCenter h5 { margin: 8px 0 4px; font-size: 11px; color: #9ab; }
+.evoSearchCenter { margin: 6px 0; border-top: 1px dashed #2a3550; border-bottom: 1px dashed #2a3550; padding: 4px 0; }
+.evoSearchCenter .evoRow { background: rgba(74, 168, 255, 0.12); }

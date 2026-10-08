@@ -1,0 +1,16 @@
+# Local-only Debug Mode marker — its absence is what makes Debug Mode
+# unavailable to anyone else who clones this repo.
+game/debug_mode.py
+
+# Python bytecode cache — never needed, regenerated automatically.
+__pycache__/
+
+# Raw HTTP cache from digimon_scraper.py — not read by the game at
+# runtime (which serves everything from game/data/ instead).
+wikimon_cache/
+
+# download_icons.py's default --out-dir — a staging area for fetching
+# icons, not what the game actually serves (that's game/data/icons/,
+# confirmed as the only icons/ path referenced anywhere in game/src/*.js
+# or game/index.html).
+digimon_icons/

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Digimon Tile Adventure</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="charSelectOverlay">
+  <h1>Digimon Tile Adventure</h1>
+  <p>Choose your Digimon egg's Baby I form to begin.</p>
+  <div id="starterGrid"></div>
+</div>
+
+<div id="playArea">
+  <div id="gameUI">
+    <canvas id="game"></canvas>
+    <div id="toasts"></div>
+    <div id="gateInfo"></div>
+  </div>
+
+  <div id="rightSidebar">
+    <div id="placeBox">
+      <div id="levelLabel" class="placeBoxTitle">—</div>
+      <div id="crystalsLabel" class="placeBoxSub"></div>
+      <div id="keysLabel" class="placeBoxSub"></div>
+    </div>
+
+    <div id="statusPanel">
+      <div id="nameLabel" class="statusName">—</div>
+
+      <div class="statRow">
+        <div class="statHeader"><span>HP</span><span id="hpText" class="statValue"></span></div>
+        <div class="barTrack"><div id="hpBar" class="barFill"></div></div>
+      </div>
+      <div class="statRow">
+        <div class="statHeader"><span>Digicharge</span><span id="energyText" class="statValue"></span></div>
+        <div class="barTrack"><div id="energyBar" class="barFill"></div></div>
+      </div>
+      <div id="megaPowerRow" class="statRow" style="display:none">
+        <div class="statHeader"><span>Mega Power</span><span id="megaPowerText" class="statValue"></span></div>
+        <div class="barTrack"><div id="megaPowerBar" class="barFill megaBar"></div></div>
+      </div>
+      <div id="scoreLabel" class="statusScore">Score: 0</div>
+      <div id="timerLabel" class="statusTimer">Time: 0:00</div>
+      <div id="pacificLabel" class="statusPacific"></div>
+      <div id="affinityLabel"></div>
+    </div>
+
+    <div id="evoPanel">
+      <h3 id="evoPanelTitle">Evolutions</h3>
+      <div id="evoList"></div>
+    </div>
+
+    <div id="instructions">Arrows: move · WASD: fire (hold to charge as Mega) · Space: sprint (costs energy) · Ctrl+P: pause/settings · Y: to Yggdrasil (once earned) · M: mega-evolve (once reached) · Space/Q: skip Homeostasis Explanations<br>B: debug mode</div>
+    <div id="foodLegend"></div>
+  </div>
+</div>
+
+<div id="settings"></div>
+<div id="cutsceneOverlay"></div>
+
+<div id="megaPickerOverlay">
+  <h2>Choose your Mega</h2>
+  <p>Pick any Mega-stage Digimon to evolve into instantly.</p>
+  <input id="megaPickerSearch" type="text" placeholder="Search...">
+  <div id="megaPickerGrid"></div>
+</div>
+
+<script src="src/config.js"></script>
+<script src="src/data.js"></script>
+<script src="src/map.js"></script>
+<script src="src/entities.js"></script>
+<script src="src/game.js"></script>
+</body>
+</html>
